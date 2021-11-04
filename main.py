@@ -18,26 +18,28 @@ PASSWORD = os.environ.get("PASSWORD")
 
 def connect(url: str=IP, username: str=USERNAME,
             password: str=PASSWORD) -> ClientLibrary:
-    """
-    
-    """
+    """GET the cml client connection"""
     with contextlib.redirect_stderr(io.StringIO()):
         return ClientLibrary(url=url, username=username,
                              password=password, ssl_verify=False)
 
 def get_lab_list(connect: ClientLibrary) -> list:
+    """GET the list of labs"""
     return connect.all_labs()
 
 def start_lab(connect: ClientLibrary, lab_id: str) -> None:
+    """Start a lab"""
     print(f"Please wait.... Currently starting lab: {lab_id}")
     lab = connect.get_local_lab(lab_id)
     lab.start()
 
 def stop_lab(connect: ClientLibrary, lab_id: str) -> None:
+    """Stop a lab"""
     lab = connect.get_local_lab(lab_id)
     lab.stop()
 
 def print_lab_list(lab_list: list, print_lab: bool=False) -> dict:
+    """Print the list of labs"""
     i = 0
     labs = {}     
     for lab in lab_list:
