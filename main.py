@@ -5,7 +5,9 @@ import contextlib
 import io
 from virl2_client import ClientLibrary
 from dotenv import load_dotenv
-from rich import print 
+from rich import print
+from virl2_client import models
+from virl2_client.models.lab import Lab
 
 # This loads the .env file if it exists
 load_dotenv()
@@ -23,7 +25,7 @@ def connect(url: str=IP, username: str=USERNAME,
         return ClientLibrary(url=url, username=username,
                              password=password, ssl_verify=False)
 
-def get_lab_list(connect: ClientLibrary) -> list:
+def get_lab_list(connect: ClientLibrary) -> Lab:
     """GET the list of labs"""
     return connect.all_labs()
 
@@ -45,7 +47,10 @@ def print_lab_list(lab_list: list, print_lab: bool=False) -> dict:
     for lab in lab_list:
         labs[i] = lab.id
         if print_lab:
-            print(f"\t[italic blue]{i}.[italic blue] {lab.title}")
+            if lab.state() == "STARTED":
+                print(f"\t[italic blue]{i}.[italic blue] {lab.title:^25s} | [green]{lab.state()}[green]")
+            else:
+                print(f"\t[italic blue]{i}.[italic blue] {lab.title:^25s} | [red]{lab.state()}[red]")
         i += 1
     return labs
 
