@@ -1,0 +1,12 @@
+version: "3"
+services:
+  cml-api:
+    build: .
+    image: labeveryday/cml_app
+    ports:
+     - "15000:5000"
+    environment:
+     - CML_IP=${CML_IP}
+     - CML_USERNAME=${CML_USERNAME}
+     - CML_PASSWORD=${CML_PASSWORD}
+     - CML_API_KEY=${CML_API_KEY}
