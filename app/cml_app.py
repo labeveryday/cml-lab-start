@@ -31,16 +31,34 @@ def get_labs():
     labs = get_lab_list(cml)
     return jsonify(labs), 200
 
-@app.route("/lab/<lab_id>/<status>", methods=["POST"])
 @app.route("/lab/<lab_id>", methods=["GET"])
-def get_update_lab_status(lab_id: str, status: str=None):
+def get_update_lab_status(lab_id: str,):
     """GET lab status
     args:
         lab_id (int): key number of lab_dict
-        status=<status> (str): (Optional) start/start cml lab
     """
     # Check for optional arg ?status=<state>
-    #status = request.args.get('status', type = str)
+    cml = cml_connect(ip, username, password)
+    labs = get_lab_list(cml)
+    # Create a list of ints 1 through the number of labs
+    lab_check = [i for i in range(1, len(labs) + 1)]
+    # Check if lab_id is in the list of ints
+    if int(lab_id) in lab_check:
+        return jsonify(
+            {
+                "name": labs[int(lab_id) - 1]["name"],
+                "status": labs[int(lab_id) - 1]["state"],
+                }
+                ), 200
+    else:
+        return jsonify("Record not found"), 400
+
+@app.route("/lab/<lab_id>/<status>", methods=["POST"])
+def start_stop_lab(lab_id: str, status: str):
+    """Start or Stop lab
+    args:
+        status (str): pass `start` or stop to update CML lab status
+    """
     cml = cml_connect(ip, username, password)
     labs = get_lab_list(cml)
     # Create a list of ints 1 through the number of labs
@@ -51,7 +69,7 @@ def get_update_lab_status(lab_id: str, status: str=None):
             # Check api key
             check_auth = check_authorization(request)
             # Check optional <status> arg
-            if status and status == "start":
+            if status and status.lower() == "start":
                 # If authorized, start lab and return status
                 if check_auth[0]:
                     cml.start_lab(labs[int(lab_id) - 1][lab_id])
@@ -63,7 +81,7 @@ def get_update_lab_status(lab_id: str, status: str=None):
                             ), 200
                 else:
                     return jsonify(check_auth[1]), 400
-            elif status and status == "stop":
+            elif status and status.lower() == "stop":
                 if check_auth[0]:
                     cml.stop_lab(labs[int(lab_id) - 1][lab_id])
                     return jsonify(
@@ -74,6 +92,8 @@ def get_update_lab_status(lab_id: str, status: str=None):
                             ), 200
                 else:
                     return jsonify(check_auth[1]), 400
+            else:
+                return jsonify("Invalid status"), 400
         else:
             return jsonify(
                 {
