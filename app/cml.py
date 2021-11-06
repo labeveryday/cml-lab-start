@@ -23,7 +23,7 @@ class Cml:
         self.username = username
         self.password = password
         self.connect = self._connect()
-    
+
     def __repr__(self):
         """String representation of an Cml object"""
         return f"Cml({self.ip}, {self.username}, {self.password})"
@@ -32,7 +32,7 @@ class Cml:
         """GET the cml client connection"""
         with contextlib.redirect_stderr(io.StringIO()):
             return ClientLibrary(url=self.ip, username=self.username,
-                                     password=self.password, ssl_verify=False)
+                                 password=self.password, ssl_verify=False)
 
     def get_lab_list(self) -> Lab:
         """GET the list of labs ids"""
